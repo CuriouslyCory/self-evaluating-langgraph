@@ -1,7 +1,6 @@
 import { END, StateGraph } from "@langchain/langgraph";
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
+import { type ChatOllama } from "@langchain/community/chat_models/ollama";
 import {
-  AIMessage,
   type BaseMessage,
   SystemMessage,
   HumanMessage,
@@ -45,16 +44,13 @@ export async function generateContent(
   // Step 1: Worker solves initial prompt
   graph.addNode("worker", async (state: GraphState) => {
     const promptTemplate = ChatPromptTemplate.fromMessages([
+      new SystemMessage(
+        "You are 'the worker', a helpful AI agent. Please answer the questions as best as you can. Do not respond with greetings or pleasantries. Only respond with the complete answer.",
+      ),
       new MessagesPlaceholder("messages"),
     ]);
-    // create messages
     const history = new ChatMessageHistory();
-    await history.addMessages([
-      new SystemMessage(
-        "You are 'the worker' a helpful AI agent. Please answer the questions as best as you can. When given feedback, rewrite the entire answer integrating the feedback.",
-      ),
-      new HumanMessage(state.prompt),
-    ]);
+    await history.addMessage(new HumanMessage(state.prompt));
     const chain = promptTemplate.pipe(workerModel);
     const res = await chain.invoke({ messages: await history.getMessages() });
     await history.addAIMessage(res.content.toString());
@@ -87,20 +83,22 @@ ${state.workerDraft}
 End Worker Answer.
 
 # Instructions: 
-Give a binary response of "yes" or "no" to the question: "Does 'Worker answer' fully satisfy the requirements of the original prompt?"`),
+Give a single numerical response to the following question: On a scale of 1-5, does the worker's answer match the original prompt?`),
     ]);
     const chain = promptTemplate.pipe(evalModel);
 
     const res = await chain.invoke({ messages: await history.getMessages() });
     await history.addAIMessage(res.content.toString());
-
-    if (res.content.toString().toLowerCase().includes("yes")) {
+    console.log("Evaluator response:", res.content.toString());
+    if (
+      res.content.toString().toLowerCase().includes("4") ||
+      res.content.toString().toLowerCase().includes("5")
+    ) {
       return {
         passed: true,
         finalCopy: state.workerDraft,
       };
     }
-    console.log("Evaluator response:", res.content.toString());
     return {
       passed: false,
       finalCopy: state.workerDraft,

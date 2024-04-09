@@ -1,14 +1,17 @@
 import Head from "next/head";
+import { useId, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 import { api } from "~/utils/api";
 
 export default function Home() {
   const hello = api.post.hello.useMutation();
+  const [questionInput, setQuestionInput] = useState("");
 
   function handleClick() {
     hello.mutate({
-      text: "Invent a fictional character for a sci-fi mystery story. Describe their physical appearance, personality, background, and what makes them unique.",
+      text: questionInput,
     });
   }
   return (
@@ -20,6 +23,11 @@ export default function Home() {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
         <h1>Hello Agent</h1>
+        <Input
+          placeholder="Type your question here"
+          onChange={(e) => setQuestionInput(e.target.value)}
+          className="bg-transparent"
+        />
         <Button onClick={handleClick}>Air speed?</Button>
         {hello?.data?.response}
       </main>
