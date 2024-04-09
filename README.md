@@ -1,8 +1,10 @@
 # Self Evaluating LLM with LangGraph
 
-Example requires a locally running [Ollama](https://ollama.com) instance with `mistral` available.
+<img src="./public/flow.png" />
 
 ## Getting Started
+
+Example requires a locally running [Ollama](https://ollama.com) instance with `mistral` available.
 
 ```bash
 # clone the repo
