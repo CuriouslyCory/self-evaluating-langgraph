@@ -9,6 +9,7 @@ Example requires a locally running [Ollama](https://ollama.com) instance with `m
 ```bash
 # assumes ollama is already running
 # clone the repo
+git clone git@github.com:CuriouslyCory/self-evaluating-langgraph.git
 cd self-evaluating-langgraph
 
 # install dependencies
