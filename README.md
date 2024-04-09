@@ -7,11 +7,13 @@
 Example requires a locally running [Ollama](https://ollama.com) instance with `mistral` available.
 
 ```bash
-# clone the repo
-
 # assumes ollama is already running
+# clone the repo
+cd self-evaluating-langgraph
+
 # install dependencies
 npm i
+
 # run local development server
 npm run dev
 ```
